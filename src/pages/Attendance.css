@@ -1,0 +1,162 @@
+.attendance-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.success-banner {
+  background: var(--secondary-light);
+  color: var(--secondary);
+  padding: 1rem 1.5rem;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.filters-card {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 1.25rem 2rem;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-item label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.filter-item input, 
+.filter-item select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  min-width: 160px;
+}
+
+.filter-stats {
+  display: flex;
+  gap: 2rem;
+  margin-left: auto;
+  padding-left: 2rem;
+  border-left: 1px solid var(--border-color);
+}
+
+.filter-stats .stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.filter-stats .label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.filter-stats .value {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.text-success { color: var(--secondary); }
+.text-danger { color: var(--danger); }
+
+.attendance-list {
+  padding: 0;
+  overflow: hidden;
+}
+
+.list-header {
+  display: flex;
+  padding: 1rem 2rem;
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.col-name { flex: 1; }
+.col-status { width: 240px; text-align: center; }
+
+.attendance-row {
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.attendance-row:hover {
+  background: #f8fafc;
+}
+
+.status-toggle {
+  display: flex;
+  background: var(--bg-main);
+  padding: 4px;
+  border-radius: 8px;
+  width: 240px;
+}
+
+.status-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.status-btn.active.present {
+  background: var(--secondary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.status-btn.active.absent {
+  background: var(--danger);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 768px) {
+  .filters-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .filter-stats {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    width: 100%;
+    justify-content: space-around;
+  }
+}
