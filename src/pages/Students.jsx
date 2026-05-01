@@ -7,34 +7,36 @@ import {
   Eye, 
   Edit2, 
   Send,
-  X
+  X,
+  ChevronDown
 } from 'lucide-react';
+import { INITIAL_STUDENTS, CLASSES, SECTIONS } from '../utils/data';
 import './Students.css';
 
 const Students = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedClass, setSelectedClass] = useState('All');
+  const [selectedSection, setSelectedSection] = useState('All');
   const [showModal, setShowModal] = useState(false);
+  const [students, setStudents] = useState(INITIAL_STUDENTS);
 
-  const students = [
-    { id: 1, name: 'Alex Doe', class: 'Grade 10', email: 'john@example.com', attendance: 92, lastScore: 85, status: 'High' },
-    { id: 2, name: 'Leo Smith', class: 'Grade 9', email: 'sarah@example.com', attendance: 78, lastScore: 62, status: 'Medium' },
-    { id: 3, name: 'Emma Johnson', class: 'Grade 10', email: 'mike@example.com', attendance: 95, lastScore: 94, status: 'High' },
-    { id: 4, name: 'Noah Brown', class: 'Grade 8', email: 'emily@example.com', attendance: 65, lastScore: 45, status: 'Low' },
-    { id: 5, name: 'Sophia Wilson', class: 'Grade 9', email: 'david@example.com', attendance: 88, lastScore: 78, status: 'Medium' },
-    { id: 6, name: 'James Miller', class: 'Grade 10', email: 'lisa@example.com', attendance: 91, lastScore: 82, status: 'High' },
-  ];
-
-  const filteredStudents = students.filter(s => 
-    s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredStudents = students.filter(student => {
+    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         student.rollNo.includes(searchTerm);
+    
+    const matchesClass = selectedClass === 'All' || student.class === selectedClass;
+    const matchesSection = selectedSection === 'All' || student.section === selectedSection;
+    
+    return matchesSearch && matchesClass && matchesSection;
+  });
 
   return (
     <div className="students-page fade-in">
       <div className="page-header">
         <div>
           <h1>Student Management</h1>
-          <p>Manage and track your students' information</p>
+          <p>Organize students by class and section for better tracking.</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowModal(true)}>
           <Plus size={18} />
@@ -42,21 +44,39 @@ const Students = () => {
         </button>
       </div>
 
-      <div className="table-actions">
+      <div className="table-actions-container card">
         <div className="search-box">
           <Search size={18} className="search-icon" />
           <input 
             type="text" 
-            placeholder="Search by name or parent email..." 
+            placeholder="Search by name, roll no, or email..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="filter-group">
-          <button className="btn btn-secondary-outline">
-            <Filter size={18} />
-            Filter
-          </button>
+        
+        <div className="filters-group">
+          <div className="filter-dropdown">
+            <label>Class</label>
+            <div className="select-wrapper">
+              <select value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)}>
+                <option value="All">All Classes</option>
+                {CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <ChevronDown size={14} className="select-arrow" />
+            </div>
+          </div>
+          
+          <div className="filter-dropdown">
+            <label>Section</label>
+            <div className="select-wrapper">
+              <select value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
+                <option value="All">All Sections</option>
+                {SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
+              </select>
+              <ChevronDown size={14} className="select-arrow" />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -64,26 +84,33 @@ const Students = () => {
         <table className="data-table">
           <thead>
             <tr>
+              <th>Roll No</th>
               <th>Student Name</th>
-              <th>Class</th>
-              <th>Parent Email</th>
+              <th>Class & Section</th>
               <th>Attendance %</th>
-              <th>Last Test Score</th>
+              <th>Last Score</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredStudents.map(student => (
+            {filteredStudents.length > 0 ? filteredStudents.map(student => (
               <tr key={student.id}>
+                <td className="font-mono text-xs font-bold text-muted">#{student.rollNo}</td>
                 <td>
                   <div className="student-info">
                     <div className="student-avatar">{student.name.charAt(0)}</div>
-                    <span className="font-medium">{student.name}</span>
+                    <div>
+                      <span className="font-medium block">{student.name}</span>
+                      <span className="text-xs text-muted">{student.email}</span>
+                    </div>
                   </div>
                 </td>
-                <td>{student.class}</td>
-                <td className="text-muted">{student.email}</td>
+                <td>
+                  <div className="class-badge">
+                    {student.class} • Section {student.section}
+                  </div>
+                </td>
                 <td>
                   <div className="progress-mini">
                     <div className="progress-bar" style={{ width: `${student.attendance}%` }}></div>
@@ -93,10 +120,10 @@ const Students = () => {
                 <td>{student.lastScore}/100</td>
                 <td>
                   <span className={`badge badge-${
-                    student.status === 'High' ? 'success' : 
-                    student.status === 'Medium' ? 'warning' : 'danger'
+                    student.lastScore >= 80 ? 'success' : 
+                    student.lastScore >= 50 ? 'warning' : 'danger'
                   }`}>
-                    {student.status}
+                    {student.lastScore >= 80 ? 'High' : student.lastScore >= 50 ? 'Medium' : 'Low'}
                   </span>
                 </td>
                 <td>
@@ -107,7 +134,13 @@ const Students = () => {
                   </div>
                 </td>
               </tr>
-            ))}
+            )) : (
+              <tr>
+                <td colSpan="7" className="text-center py-8 text-muted">
+                  No students found for the selected filters.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -119,19 +152,33 @@ const Students = () => {
               <h3>Add New Student</h3>
               <button className="close-btn" onClick={() => setShowModal(false)}><X size={20} /></button>
             </div>
-            <form className="modal-form" onSubmit={(e) => e.preventDefault()}>
+            <form className="modal-form" onSubmit={(e) => {
+              e.preventDefault();
+              setShowModal(false);
+            }}>
               <div className="form-row">
                 <div className="form-group">
                   <label>Student Name</label>
-                  <input type="text" placeholder="Enter student name" required />
+                  <input type="text" placeholder="Enter full name" required />
                 </div>
                 <div className="form-group">
-                  <label>Class/Grade</label>
+                  <label>Roll Number</label>
+                  <input type="text" placeholder="e.g. 101" required />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Class</label>
                   <select required>
                     <option value="">Select Class</option>
-                    <option value="8">Grade 8</option>
-                    <option value="9">Grade 9</option>
-                    <option value="10">Grade 10</option>
+                    {CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Section</label>
+                  <select required>
+                    <option value="">Select Section</option>
+                    {SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
                   </select>
                 </div>
               </div>
@@ -139,13 +186,9 @@ const Students = () => {
                 <label>Parent Email</label>
                 <input type="email" placeholder="parent@example.com" required />
               </div>
-              <div className="form-group">
-                <label>Phone Number</label>
-                <input type="tel" placeholder="+1 (555) 000-0000" />
-              </div>
               <div className="form-footer">
                 <button type="button" className="btn btn-secondary-outline" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save Student</button>
+                <button type="submit" className="btn btn-primary">Add Student</button>
               </div>
             </form>
           </div>

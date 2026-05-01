@@ -20,6 +20,7 @@ import {
   Bar,
   Cell
 } from 'recharts';
+import { INITIAL_STUDENTS } from '../utils/data';
 import './Dashboard.css';
 
 const StatCard = ({ title, value, icon, trend, trendValue, color }) => (
@@ -84,7 +85,7 @@ const Dashboard = () => {
       <div className="stats-grid">
         <StatCard 
           title="Total Students" 
-          value="128" 
+          value={INITIAL_STUDENTS.length} 
           icon={<Users size={24} />} 
           trend="up" 
           trendValue="+12%" 

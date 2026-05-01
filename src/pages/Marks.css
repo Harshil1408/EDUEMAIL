@@ -7,13 +7,13 @@
 .test-config {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
   padding: 1.5rem 2rem;
 }
 
-.config-grid {
+.config-row-main {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1.5rem;
 }
 
@@ -24,13 +24,10 @@
 }
 
 .config-item label {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
   color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
 }
 
 .config-item input, 
@@ -39,7 +36,17 @@
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.875rem;
-  background: #f8fafc;
+  background: white;
+}
+
+.inline-date {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  font-weight: 700 !important;
+  font-size: 1.125rem !important;
+  cursor: pointer;
+  color: var(--text-main);
 }
 
 .test-summary {
@@ -64,48 +71,13 @@
 
 .summary-stat .value {
   display: block;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 700;
 }
 
 .marks-table-container {
   padding: 0;
   overflow: hidden;
-}
-
-.table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.25rem 2rem;
-  background: white;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.search-mini {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-mini svg {
-  position: absolute;
-  left: 0.75rem;
-  color: var(--text-muted);
-}
-
-.search-mini input {
-  padding: 0.5rem 0.75rem 0.5rem 2.25rem;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  font-size: 0.8125rem;
-  width: 220px;
-}
-
-.class-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-muted);
 }
 
 .mark-input-wrapper {
@@ -115,12 +87,18 @@
 }
 
 .mark-input {
-  width: 60px;
-  padding: 0.4rem;
+  width: 65px;
+  padding: 0.5rem;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: 6px;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
+  background: var(--bg-main);
+}
+
+.mark-input:focus {
+  background: white;
+  border-color: var(--primary);
 }
 
 .max-marks {
@@ -151,7 +129,7 @@
 
 .feedback-input {
   width: 100%;
-  padding: 0.4rem 0.75rem;
+  padding: 0.5rem;
   border: 1px solid transparent;
   border-radius: 4px;
   font-size: 0.8125rem;
@@ -159,14 +137,12 @@
 }
 
 .feedback-input:focus {
-  background: #f8fafc;
+  background: var(--bg-main);
   border-color: var(--border-color);
 }
 
-.row-warning {
-  background-color: #fff9f9;
-}
-
-.row-warning:hover {
-  background-color: #fff1f1 !important;
+.empty-state {
+  padding: 4rem;
+  text-align: center;
+  color: var(--text-muted);
 }

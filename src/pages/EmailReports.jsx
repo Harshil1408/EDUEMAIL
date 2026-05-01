@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Send, 
   Clock, 
@@ -6,27 +6,29 @@ import {
   Eye, 
   CheckCircle2, 
   Mail,
-  ChevronRight,
+  ChevronDown,
   Info,
-  Calendar
+  Calendar,
+  Search
 } from 'lucide-react';
+import { INITIAL_STUDENTS, CLASSES, SECTIONS } from '../utils/data';
 import './EmailReports.css';
 
 const EmailReports = () => {
-  const [selectedStudents, setSelectedStudents] = useState([1, 2]);
+  const [selectedClass, setSelectedClass] = useState(CLASSES[0]);
+  const [selectedSection, setSelectedSection] = useState(SECTIONS[0]);
+  const [selectedStudents, setSelectedStudents] = useState([]);
   const [reportType, setReportType] = useState('Monthly Progress');
   const [subject, setSubject] = useState('Monthly Performance Report - {{student_name}}');
   const [message, setMessage] = useState('Dear Parent,\n\nPlease find the monthly performance report for {{student_name}}.\n\nAttendance: {{attendance}}%\nLast Test Score: {{marks}}%\n\nRegards,\nEduStream Admin');
-  const [showPreview, setShowPreview] = useState(false);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const students = [
-    { id: 1, name: 'Alex Doe', class: 'Grade 10', attendance: 92, marks: 85 },
-    { id: 2, name: 'Emma Johnson', class: 'Grade 10', attendance: 95, marks: 94 },
-    { id: 3, name: 'James Miller', class: 'Grade 10', attendance: 45, marks: 45 },
-    { id: 4, name: 'Lily Evans', class: 'Grade 10', attendance: 72, marks: 72 },
-  ];
+  const students = INITIAL_STUDENTS.filter(s => s.class === selectedClass && s.section === selectedSection);
+
+  useEffect(() => {
+    setSelectedStudents([]);
+  }, [selectedClass, selectedSection]);
 
   const handleSend = () => {
     setSending(true);
@@ -38,13 +40,15 @@ const EmailReports = () => {
   };
 
   const getPreviewMessage = (student) => {
+    if (!student) return message;
     return message
       .replace('{{student_name}}', student.name)
       .replace('{{attendance}}', student.attendance)
-      .replace('{{marks}}', student.marks);
+      .replace('{{marks}}', student.lastScore);
   };
 
   const getPreviewSubject = (student) => {
+    if (!student) return subject;
     return subject.replace('{{student_name}}', student.name);
   };
 
@@ -53,7 +57,7 @@ const EmailReports = () => {
       <div className="page-header">
         <div>
           <h1>Email Reports</h1>
-          <p>Send personalized reports to parents with a single click.</p>
+          <p>Send personalized reports to parents by class and section.</p>
         </div>
       </div>
 
@@ -61,13 +65,32 @@ const EmailReports = () => {
         <div className="reports-config">
           <div className="card config-section">
             <h3>1. Select Recipients</h3>
+            <div className="class-section-selector">
+              <div className="filter-group-mini">
+                <select value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)}>
+                  {CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <select value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
+                  {SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
+                </select>
+              </div>
+            </div>
+            
             <div className="student-selector">
               <div className="selector-header">
                 <div className="search-mini">
-                  <Mail size={16} />
+                  <Search size={14} />
                   <input type="text" placeholder="Search students..." />
                 </div>
-                <button className="btn-text">Select All</button>
+                <button 
+                  className="btn-text"
+                  onClick={() => {
+                    if (selectedStudents.length === students.length) setSelectedStudents([]);
+                    else setSelectedStudents(students.map(s => s.id));
+                  }}
+                >
+                  {selectedStudents.length === students.length ? 'Deselect All' : 'Select All'}
+                </button>
               </div>
               <div className="student-list-mini">
                 {students.map(s => (
@@ -86,10 +109,11 @@ const EmailReports = () => {
                     <div className="student-avatar-mini">{s.name.charAt(0)}</div>
                     <div className="student-details-mini">
                       <span className="name">{s.name}</span>
-                      <span className="class">{s.class}</span>
+                      <span className="info">Roll: {s.rollNo}</span>
                     </div>
                   </label>
                 ))}
+                {students.length === 0 && <p className="p-4 text-center text-muted">No students found.</p>}
               </div>
             </div>
           </div>
@@ -116,7 +140,7 @@ const EmailReports = () => {
             <div className="form-group">
               <label>Message Body</label>
               <textarea 
-                rows={8}
+                rows={6}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               ></textarea>
@@ -132,20 +156,12 @@ const EmailReports = () => {
           <div className="card preview-card">
             <div className="preview-header">
               <h3>Email Preview</h3>
-              <div className="preview-tabs">
-                <button className="tab active">Desktop</button>
-                <button className="tab">Mobile</button>
-              </div>
             </div>
             
             <div className="email-preview-container">
               {selectedStudents.length > 0 ? (
                 <div className="email-mockup">
                   <div className="email-meta">
-                    <div className="meta-row">
-                      <span className="label">From:</span>
-                      <span className="value">EduStream Admin &lt;reports@edustream.com&gt;</span>
-                    </div>
                     <div className="meta-row">
                       <span className="label">To:</span>
                       <span className="value">Parent of {students.find(s => s.id === selectedStudents[0])?.name}</span>
@@ -158,14 +174,14 @@ const EmailReports = () => {
                   
                   <div className="email-body-content">
                     <div className="edu-logo">🎓 EduStream</div>
-                    <div className="report-badge">STUDENT PROGRESS REPORT</div>
+                    <div className="report-badge">{reportType.toUpperCase()}</div>
                     <div className="message-text">
                       {getPreviewMessage(students.find(s => s.id === selectedStudents[0])).split('\n').map((line, i) => (
                         <p key={i}>{line}</p>
                       ))}
                     </div>
                     <div className="report-footer">
-                      © 2026 EduStream Systems. All rights reserved.
+                      © 2026 EduStream Tuition Center.
                     </div>
                   </div>
                 </div>
@@ -178,10 +194,6 @@ const EmailReports = () => {
             </div>
 
             <div className="preview-actions">
-              <div className="schedule-btn">
-                <Clock size={18} />
-                <span>Schedule for later</span>
-              </div>
               <button 
                 className={`btn btn-primary send-btn ${sending ? 'loading' : ''}`}
                 disabled={selectedStudents.length === 0 || sending}
@@ -201,7 +213,7 @@ const EmailReports = () => {
             <div className="sent-success-modal fade-in">
               <CheckCircle2 size={48} className="text-success" />
               <h3>Reports Sent!</h3>
-              <p>Email reports have been queued for delivery to {selectedStudents.length} parents.</p>
+              <p>Email reports have been queued for {selectedStudents.length} students.</p>
             </div>
           )}
         </div>

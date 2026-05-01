@@ -96,6 +96,7 @@
   text-transform: uppercase;
 }
 
+.col-roll { width: 80px; font-weight: 600; color: var(--text-muted); }
 .col-name { flex: 1; }
 .col-status { width: 240px; text-align: center; }
 
